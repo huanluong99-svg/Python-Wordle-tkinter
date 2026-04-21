@@ -5,6 +5,10 @@ from random import randint
 target_word = ''
 current_row = 0
 current_col = 0
+correct_letters = set()   # green
+present_letters = set()   # yellow
+wrong_letters = set()     # grey
+target_list = []
 settings = Settings()
 
 word_list = []
@@ -13,12 +17,12 @@ with open('5-letter-words.txt', 'r') as file:
     for word in words:
         word_list.append(word.rstrip())
 
-def on_key(event, entries):
+def on_key(event, entries, keyboard_entries):
     global current_row, current_col
 
     # ENTER
     if event.keysym == "Return":
-        on_enter(entries)
+        on_enter(entries, keyboard_entries)
         return "break"
 
     # BACKSPACE
@@ -55,8 +59,8 @@ def on_backspace(entries):
     cell.config(state="normal")
     cell.delete(0, "end")
 
-def on_enter(entries):
-    global target_word, current_row, current_col
+def on_enter(entries, keyboard_entries):
+    global target_word, current_row, current_col, target_list, guessed_letters
 
     guess_word = "".join(e.get() for e in entries[current_row])
 
@@ -74,13 +78,11 @@ def on_enter(entries):
     guess_list = [] 
     for letter in guess_word: 
         guess_list.append(letter)
-
-    target_list = [] 
-    for letter in target_word: 
-        target_list.append(letter) 
-        print(guess_list) 
-        print(target_list)
     
+
+    print(guess_list) 
+    print(target_list)
+
     i = 0 
     while i < len(guess_list): 
         e = guess_list[i] 
@@ -93,8 +95,14 @@ def on_enter(entries):
         elif e not in target_list: # not in word at all 
             entries[current_row][i].config(disabledbackground=settings.cell_colour_wrong) 
             print(e, "was not in word") 
+        if e == target_list[i]:
+            correct_letters.add(e)
+        elif e in target_list:
+            present_letters.add(e)
+        else:
+            wrong_letters.add(e)
         i += 1
-
+    
     # check letters...
     # (your logic stays the same)
 
@@ -108,23 +116,61 @@ def on_enter(entries):
 
     if current_row < len(entries):
         entries[current_row][0].focus_set()
+    
+    change_keyboard_colour(keyboard_entries)
 
     return "break"
 
+def change_keyboard_colour(keyboard_entries):
+    print("CHANGING KEYBOARD COLOURS")
+    for row in keyboard_entries:
+        print(len(row))
+
+    for row in keyboard_entries:
+        for button in row:
+            key = button["text"].lower()
+
+            if key in ["enter", "backspace"]:
+                continue
+
+            if key in correct_letters:
+                button.config(
+                    fg=settings.cell_colour_correct
+                )
+
+            elif key in present_letters:
+                button.config(
+                    fg=settings.cell_colour_half
+                )
+
+            elif key in wrong_letters:
+                button.config(
+                    fg=settings.cell_colour_wrong
+                )
+
 # function to generate a new 5-letter word
 def generate_new_word():
-    
+    global target_list
     target_word = word_list[randint(0,len(word_list))]
+
+    for letter in target_word: 
+        target_list.append(letter.upper())
+
     return target_word
 
 # function to start a new game
 def start_new_game(entries):
     settings = Settings()
     global target_word, current_row, current_col
-    
-    #reset game state
+    global correct_letters, present_letters, wrong_letters, target_list
+
+    # reset everything
     current_row = 0
     current_col = 0
+    correct_letters.clear()
+    present_letters.clear()
+    wrong_letters.clear()
+    target_list.clear()
     
     for row in entries:
         for col in row:
@@ -147,9 +193,8 @@ def start_new_game(entries):
     print("ROW:", current_row, "COL:", current_col)
 
 
-
 # function to change cell colour if found on enter
-def keyboard_button(root, entries, letter):
+def keyboard_button(entries, letter):
     global current_row, current_col
 
     if current_row >= len(entries):
@@ -178,4 +223,3 @@ def update_row_states(entries):
                 e.config(state="normal")
             else:
                 e.config(state="disabled")
-
