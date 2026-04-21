@@ -54,43 +54,38 @@ def run_wordle_game():
         keyboard_letters_list = [
             ['q','w','e','r','t','y','u','i','o','p'],
             ['a','s','d','f','g','h','j','k','l'],
-            ['enter','z','x','c','v','b','n','m','backspace']
+            ['ent','z','x','c','v','b','n','m','bksp']
         ]
 
         keyboard_entries = []
+
+        row_offsets = [0, 1, 2]
 
         for r, row in enumerate(keyboard_letters_list):
             keyboard_row_entries = []
             for c, letter in enumerate(row):
 
-                btn = tk.Button(
+                label = tk.Label(
                     keyboard_frame,
                     text=letter.upper(),
-                    width=2,
-                    font=settings.small_button_font,
+                    width=4,
+                    height=3,
                     bg=settings.cell_colour,
-                    fg=settings.text_colour
+                    fg=settings.text_colour,
+                    font=settings.small_button_font
                 )
 
-                if letter == 'enter':
-                    btn.config(
-                        font=settings.smaller_button_font,
-                        command=lambda ent=entries, kb=keyboard_entries: gf.on_enter(ent, kb)
-                    )
+                if letter == 'ent':
+                    label.bind("<Button-1>", lambda event, ent=entries, kb=keyboard_entries: gf.on_enter(ent, kb))
 
-                elif letter == 'backspace':
-                    btn.config(
-                        font=settings.smaller_button_font,
-                        command=lambda ent=entries: gf.on_backspace(ent)
-                    )
+                elif letter == 'bksp':
+                    label.bind("<Button-1>", lambda event, ent=entries: gf.on_backspace(ent))
 
                 else:
-                    btn.config(
-                        command=lambda l=letter, ent=entries: gf.keyboard_button(ent, l)
-                    )
+                    label.bind("<Button-1>", lambda event, l=letter: gf.keyboard_button(entries, l))
 
-                btn.grid(row=r, column=c, padx=1, pady=1)
-                keyboard_row_entries.append(btn)
+                label.grid(row=r, column=c + row_offsets[r], padx=1, pady=1)
+                keyboard_row_entries.append(label)
 
             keyboard_entries.append(keyboard_row_entries)
 
@@ -100,13 +95,13 @@ def run_wordle_game():
                 e.bind("<KeyPress>", lambda event, ent=entries, kb=keyboard_entries: gf.on_key(event, ent, kb))
 
         entries[0][0].focus_set()
-        gf.start_new_game(entries)
+        gf.start_new_game(entries, keyboard_entries)
         
 
         #start new game button
         reset_button = tk.Button(root, text='New Game', font = settings.button_font, pady=10, 
             bg=settings.screen_colour, fg = settings.text_colour,
-            command=lambda: gf.start_new_game(entries)
+            command=lambda: gf.start_new_game(entries, keyboard_entries)
             )
         reset_button.pack(pady=5)
         

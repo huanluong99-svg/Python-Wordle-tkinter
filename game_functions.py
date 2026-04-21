@@ -123,35 +123,40 @@ def on_enter(entries, keyboard_entries):
 
 def change_keyboard_colour(keyboard_entries):
     print("CHANGING KEYBOARD COLOURS")
-    for row in keyboard_entries:
-        print(len(row))
+    print(correct_letters)
+    print(present_letters)
+    print(wrong_letters)
 
     for row in keyboard_entries:
-        for button in row:
-            key = button["text"].lower()
+        for label in row:
+            
+            key = label["text"].lower()
 
-            if key in ["enter", "backspace"]:
+            if key in ["ent", "bksp"]:
                 continue
 
-            if key in correct_letters:
-                button.config(
-                    fg=settings.cell_colour_correct
-                )
-
-            elif key in present_letters:
-                button.config(
-                    fg=settings.cell_colour_half
-                )
-
-            elif key in wrong_letters:
-                button.config(
-                    fg=settings.cell_colour_wrong
-                )
+            if key.upper() in correct_letters:
+                colour = settings.cell_colour_correct
+            elif key.upper() in present_letters:
+                colour = settings.cell_colour_half
+            elif key.upper() in wrong_letters:
+                colour = settings.cell_colour_wrong
+            else:
+                continue
+            
+            label.config(bg=colour)
+            
+    
+    keyboard_entries[0][0].update_idletasks()
+    print(key, "->", label.cget("bg"))
 
 # function to generate a new 5-letter word
 def generate_new_word():
     global target_list
-    target_word = word_list[randint(0,len(word_list))]
+    
+    target_list.clear()
+
+    target_word = word_list[randint(0, len(word_list)-1)]
 
     for letter in target_word: 
         target_list.append(letter.upper())
@@ -159,7 +164,7 @@ def generate_new_word():
     return target_word
 
 # function to start a new game
-def start_new_game(entries):
+def start_new_game(entries, keyboard_entries):
     settings = Settings()
     global target_word, current_row, current_col
     global correct_letters, present_letters, wrong_letters, target_list
@@ -181,6 +186,10 @@ def start_new_game(entries):
                     disabledbackground=settings.cell_colour
                 )
             col.delete(0, 'end')
+    
+    for row in keyboard_entries:
+        for label in row:
+            label.config(bg=settings.cell_colour)
 
     # get new target word
     target_word = generate_new_word().upper()
