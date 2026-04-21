@@ -1,0 +1,18 @@
+# The aim of this program is to make a game a lot like worldle using tkinter.
+# The user fills 5 boxes to guess a 5 letter word. 
+# With each guess, the game makes a new row of boxes. 
+# With the previous guess,
+    # if any letter was guessed correctly, the box is highlighted as green
+    # if any letter is part of the correct word but in the wrong place, that box is highlighted in yellow
+    # if any letter is completely wrong, wrong letter wrong palce, that box is highlighted in red
+    # do not allow any letter to be used more than once.
+
+# Goals: Make a tkinter window to try one letter only
+    # Test that a randomly generated letter can be guessed by the user
+
+# Next step is to add more letters one at a time until we reach 5
+# Then we make the game to generate a 5 letter word for the user to guess.
+
+# Next Steps:
+# make a reset button to generate a new word and start a new game
+# Make a keyboard that changes colour once tested
