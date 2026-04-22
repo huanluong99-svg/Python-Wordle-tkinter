@@ -15,7 +15,7 @@ def run_wordle_game():
 
     # game title label
     game_title = tk.Label(
-        root, text="Huan's Wordle Game", font = settings.text_font, pady=30, 
+        root, text="Huan's Wordle Game", font = settings.title_font, pady=20, 
         bg=settings.screen_colour, fg = settings.text_colour
         )
     game_title.pack()
@@ -59,7 +59,7 @@ def run_wordle_game():
 
         keyboard_entries = []
 
-        row_offsets = [0, 1, 2]
+        row_offsets = [0, 1, 1]
 
         for r, row in enumerate(keyboard_letters_list):
             keyboard_row_entries = []
@@ -69,7 +69,7 @@ def run_wordle_game():
                     keyboard_frame,
                     text=letter.upper(),
                     width=4,
-                    height=3,
+                    height=2,
                     bg=settings.cell_colour,
                     fg=settings.text_colour,
                     font=settings.small_button_font
