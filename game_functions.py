@@ -18,12 +18,12 @@ with open('5-letter-words.txt', 'r') as file:
     for word in words:
         word_list.append(word.rstrip())
 
-def on_key(event, entries, keyboard_entries):
+def on_key(event, entries, keyboard_entries, label):
     global current_row, current_col
 
     # ENTER
     if event.keysym == "Return":
-        on_enter(entries, keyboard_entries)
+        on_enter(entries, keyboard_entries, label)
         return "break"
 
     # BACKSPACE
@@ -60,19 +60,26 @@ def on_backspace(entries):
     cell.config(state="normal")
     cell.delete(0, "end")
 
-def on_enter(entries, keyboard_entries):
+def on_enter(entries, keyboard_entries, label):
     global target_word, current_row, current_col, target_list, guessed_letters
 
+    # set up the guess word from entries
     guess_word = "".join(e.get() for e in entries[current_row])
 
+    # reset the statement
+    change_statement_label(label, "")
+
+    # check that there are no empty cells
     if "" in [e.get() for e in entries[current_row]]:
         return "break"
 
+    # check that the guessed word is included in the list
     if guess_word.lower() not in word_list:
         for e in entries[current_row]:
             e.delete(0, tk.END)
         current_col = 0
         entries[current_row][0].focus_set()
+        change_statement_label(label, "Word does not exist in list")
         return "break"
 
     # Check if the word is correct 
@@ -89,7 +96,7 @@ def on_enter(entries, keyboard_entries):
     target_letter_count = Counter(target_list)
     print(target_letter_count)
 
-
+    # configure each field colour to green yellow or red
     i = 0 
     while i < len(guess_list): 
         e = guess_list[i]
@@ -114,9 +121,15 @@ def on_enter(entries, keyboard_entries):
             wrong_letters.add(e)
         i += 1
     
-    # check letters...
-    # (your logic stays the same)
+    # win statement
+    if guess_list == target_list:
+        change_statement_label(label, "You win!")
 
+    # lose statement, show the answer word
+    """if guess_list != target_list and current_row == 6:
+        change_statement_label(label, "You lose! The answer was", target_word)
+    """
+    # disable the current row to avoid being changed, then move to the next row
     for e in entries[current_row]:
         e.config(state="disabled")
 
@@ -127,12 +140,19 @@ def on_enter(entries, keyboard_entries):
 
     if current_row < len(entries):
         entries[current_row][0].focus_set()
+    else:
+        lose_statement = "You lose! The answer was " + target_word
+        change_statement_label(label, lose_statement)
     
     change_keyboard_colour(keyboard_entries)
 
     return "break"
 
+def change_statement_label(label, statement):
+    label.config(text=statement)
+
 def change_keyboard_colour(keyboard_entries):
+    # change colours of keyboard to indicate what letters have been used
     print("CHANGING KEYBOARD COLOURS")
     print(correct_letters)
     print(present_letters)
@@ -157,9 +177,8 @@ def change_keyboard_colour(keyboard_entries):
             
             label.config(bg=colour)
             
-    
+    # make sure that the keyboard actually changes colour
     keyboard_entries[0][0].update_idletasks()
-    print(key, "->", label.cget("bg"))
 
 # function to generate a new 5-letter word
 def generate_new_word():
@@ -175,11 +194,13 @@ def generate_new_word():
     return target_word
 
 # function to start a new game
-def start_new_game(entries, keyboard_entries):
+def start_new_game(entries, keyboard_entries, label):
     settings = Settings()
     global target_word, current_row, current_col
     global correct_letters, present_letters, wrong_letters, target_list
-
+    
+    change_statement_label(label, "")
+    
     # reset everything
     current_row = 0
     current_col = 0
@@ -237,6 +258,7 @@ def keyboard_button(entries, letter):
 def update_row_states(entries):
     global current_row
 
+    # sets current row state to normal and disables the others
     for r, row in enumerate(entries):
         for e in row:
             if r == current_row:

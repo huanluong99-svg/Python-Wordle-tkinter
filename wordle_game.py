@@ -47,6 +47,14 @@ def run_wordle_game():
                 row_entries.append(e)
             entries.append(row_entries)
 
+        # create statement label
+        statement_label = tk.Label(
+                root, text="", font = settings.label_font, pady=20, 
+                bg=settings.screen_colour, fg = settings.text_colour
+            )
+        statement_label.pack(pady=1)
+
+
         # create keyboard
         keyboard_frame = tk.Frame(root)
         keyboard_frame.pack(pady=1)
@@ -76,7 +84,7 @@ def run_wordle_game():
                 )
 
                 if letter == 'ent':
-                    label.bind("<Button-1>", lambda event, ent=entries, kb=keyboard_entries: gf.on_enter(ent, kb))
+                    label.bind("<Button-1>", lambda event, ent=entries, kb=keyboard_entries: gf.on_enter(ent, kb, statement_label))
 
                 elif letter == 'bksp':
                     label.bind("<Button-1>", lambda event, ent=entries: gf.on_backspace(ent))
@@ -92,16 +100,16 @@ def run_wordle_game():
         # bind keys (after both exist)
         for row in entries:
             for e in row:
-                e.bind("<KeyPress>", lambda event, ent=entries, kb=keyboard_entries: gf.on_key(event, ent, kb))
+                e.bind("<KeyPress>", lambda event, ent=entries, kb=keyboard_entries: gf.on_key(event, ent, kb, statement_label))
 
         entries[0][0].focus_set()
-        gf.start_new_game(entries, keyboard_entries)
+        gf.start_new_game(entries, keyboard_entries, statement_label)
         
 
         #start new game button
         reset_button = tk.Button(root, text='New Game', font = settings.button_font, pady=10, 
             bg=settings.screen_colour, fg = settings.text_colour,
-            command=lambda: gf.start_new_game(entries, keyboard_entries)
+            command=lambda: gf.start_new_game(entries, keyboard_entries, statement_label)
             )
         reset_button.pack(pady=5)
         

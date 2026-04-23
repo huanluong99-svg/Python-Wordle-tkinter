@@ -15,7 +15,8 @@ class Settings():
         self.cell_colour_wrong = "#FF6767"
         self.text_colour = "#252525"
         self.text_font = ("Helvetica", 40)
-        self.title_font = ("Helvetica", 50)
+        self.title_font = ("Helvetica Bold", 50)
+        self.label_font = ("Helvetica Bold", 30)
         self.button_font = ("Helvetica", 30)
         self.small_button_font = ("Helvetica", 20)
         self.smaller_button_font = ("Helvetica", 10)
