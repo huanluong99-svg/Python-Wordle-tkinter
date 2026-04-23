@@ -1,6 +1,7 @@
 import tkinter as tk
 from wordle_gamesettings import Settings
 from random import randint
+from collections import Counter
 
 target_word = ''
 current_row = 0
@@ -80,19 +81,29 @@ def on_enter(entries, keyboard_entries):
         guess_list.append(letter)
     
 
-    print(guess_list) 
+    print(guess_list)
     print(target_list)
+
+    # This part is for avoiding the assumption of double letters in a guess
+    # creates a counter of each unique letter in the word
+    target_letter_count = Counter(target_list)
+    print(target_letter_count)
+
 
     i = 0 
     while i < len(guess_list): 
-        e = guess_list[i] 
+        e = guess_list[i]
         if e == target_list[i]: # correct_position 
             entries[current_row][i].config(disabledbackground=settings.cell_colour_correct) 
-            print(e, "was correct") 
-        elif e in target_list: # in word, wrong spot 
+            target_letter_count[e] -= 1
+            print(e, "was correct")
+            print(e, "count reduced by 1")
+            print(target_letter_count)
+
+        elif e in target_list and target_letter_count[e] != 0: # in word, wrong spot 
             entries[current_row][i].config(disabledbackground=settings.cell_colour_half) 
             print(e, "was in word, wrong spot") 
-        elif e not in target_list: # not in word at all 
+        else: # not in word at all 
             entries[current_row][i].config(disabledbackground=settings.cell_colour_wrong) 
             print(e, "was not in word") 
         if e == target_list[i]:
@@ -156,7 +167,8 @@ def generate_new_word():
     
     target_list.clear()
 
-    target_word = word_list[randint(0, len(word_list)-1)]
+    target_word = "alley"
+    #target_word = word_list[randint(0, len(word_list)-1)]
 
     for letter in target_word: 
         target_list.append(letter.upper())
