@@ -167,8 +167,7 @@ def generate_new_word():
     
     target_list.clear()
 
-    target_word = "alley"
-    #target_word = word_list[randint(0, len(word_list)-1)]
+    target_word = word_list[randint(0, len(word_list)-1)]
 
     for letter in target_word: 
         target_list.append(letter.upper())
